@@ -1,25 +1,27 @@
-# VoxSentinel - Full Stack Render Deployment
-# Backend API (Python/FastAPI) + Frontend (React/Vite)
+# Render.com Blueprint for Full-Stack VoxSentinel Deployment
+# This deploys both Backend (FastAPI) and Frontend (React/Vite)
 
 services:
-  # ========== BACKEND API ==========
+  # Backend API Service (Python/FastAPI)
   - type: web
     name: voxsentinel-api
     env: python
     plan: free
+    region: oregon  # Choose: oregon, frankfurt, singapore
+    rootDir: AI-Voice-Detection-main
     pythonVersion: "3.11"
     buildCommand: pip install -r requirements.txt
     startCommand: uvicorn app:app --host 0.0.0.0 --port $PORT
     healthCheckPath: /
     envVars:
       - key: API_KEY
-        sync: false  # Set in Render dashboard
+        sync: false  # Set manually in Render dashboard
       - key: GROQ_API_KEY
-        sync: false  # Set in Render dashboard
+        sync: false  # Set manually in Render dashboard
       - key: SUPABASE_URL
-        sync: false  # Set in Render dashboard
+        sync: false  # Set manually in Render dashboard
       - key: SUPABASE_KEY
-        sync: false  # Set in Render dashboard
+        sync: false  # Set manually in Render dashboard
       - key: STT_PROVIDER
         value: groq
       - key: AI_PROVIDER
@@ -29,19 +31,21 @@ services:
       - key: DEMO_MODE
         value: "false"
 
-  # ========== FRONTEND (React) ==========
+  # Frontend Service (React/Vite)
   - type: web
     name: voxsentinel-frontend
     env: static
     plan: free
-    rootDir: ../frontend/voxsentinel-connect-main
+    region: oregon  # Same region as backend for lower latency
+    rootDir: frontend/voxsentinel-connect-main
     buildCommand: npm install && npm run build
     staticPublishPath: dist
+    pullRequestPreviewsEnabled: true
     envVars:
       - key: VITE_API_URL
-        sync: false  # Set to your backend URL after deployment
-      - key: VITE_API_KEY
-        sync: false  # Same as backend API_KEY
+        value: https://voxsentinel-api.onrender.com  # Update with your actual backend URL
+      - key: NODE_ENV
+        value: production
     routes:
       - type: rewrite
         source: /*

@@ -1,27 +1,48 @@
-# Call Center Compliance API - Track 3
+# Call Center Compliance API - VoxSentinel
 
-## 🎯 Overview
+> **Live URL:** https://voxsentinel.onrender.com  
+> **API Key:** `sk_track3_987654321`  
+> **Frontend Dashboard:** https://voxsentinelmain.onrender.com
 
-REST API that performs **multi-stage AI analysis** on call center recordings to extract compliance metrics and business intelligence. Supports **Tamil (Tanglish)** and **Hindi (Hinglish)** mixed-language conversations.
+## 📝 Description
+
+An intelligent call center analytics system that processes voice recordings in **Hindi (Hinglish)** and **Tamil (Tanglish)**, extracts text using speech-to-text, validates calls against standard operating procedures (SOP), and categorizes payment preferences.
+
+### Strategy & Approach
+
+The system uses a **multi-stage AI pipeline**:
+1. **Audio Ingestion** - Accept base64-encoded MP3/WAV audio via REST API
+2. **Speech-to-Text** - Groq Whisper Large v3 for accurate multilingual transcription
+3. **Transcript Cleaning** - Remove garbled characters while preserving Tamil/Hindi/English
+4. **AI Analysis** - Groq Llama 3.3 70B for structured JSON analysis with SOP validation
+5. **Pattern Detection** - Additional regex-based detection for greetings, closings, solutions
+6. **Database Storage** - Supabase PostgreSQL for call history and analytics dashboard
 
 ## 📋 Features
 
-- ✅ **Speech-to-Text** - Whisper API for accurate Hinglish/Tanglish transcription
-- ✅ **AI Summarization** - GPT-4 powered conversation summaries
-- ✅ **SOP Validation** - Automated compliance scoring against call center scripts
-- ✅ **Payment Classification** - EMI, FULL_PAYMENT, PARTIAL_PAYMENT, DOWN_PAYMENT
-- ✅ **Rejection Analysis** - Identifies reasons for incomplete sales
-- ✅ **Sentiment Analysis** - Positive, Negative, Neutral classification
-- ✅ **Keyword Extraction** - Key topics and entities from conversations
-- ✅ **API Key Authentication** - Secure access control
+| Feature | Description | Status |
+|---------|-------------|--------|
+| Voice-to-Text | Extract text from Hindi & Tamil calls | ✅ |
+| Text Summarization | AI-powered summary of call content | ✅ |
+| SOP Validation | Validate against 5-step compliance framework | ✅ |
+| Payment Categorization | EMI, Full, Partial, Down Payment | ✅ |
+| Rejection Analysis | Extract and categorize rejection reasons | ✅ |
+| Sentiment Analysis | Positive, Neutral, Negative classification | ✅ |
+| Keyword Extraction | Key topics and entities from conversations | ✅ |
+| Real-time Dashboard | Visual analytics with call history | ✅ |
 
 ## 🛠️ Tech Stack
 
-- **Framework:** FastAPI
-- **Speech-to-Text:** OpenAI Whisper API
-- **NLP Analysis:** OpenAI GPT-4-turbo
-- **Server:** Uvicorn
-- **Deployment:** Render.com
+| Component | Technology |
+|-----------|------------|
+| **Backend Framework** | FastAPI (Python 3.11) |
+| **Speech-to-Text** | Groq Whisper Large v3 (FREE, unlimited) |
+| **LLM Analysis** | Groq Llama 3.3 70B Versatile |
+| **Database** | Supabase (PostgreSQL) |
+| **Async Tasks** | Celery (optional, for batch processing) |
+| **Frontend** | React + Vite + TailwindCSS + shadcn/ui |
+| **Deployment** | Render.com (Backend + Frontend) |
+| **Server** | Uvicorn ASGI |
 
 ## 🚀 Quick Start
 
@@ -231,22 +252,59 @@ python test_client.py call_recording.mp3 Tamil
 
 ## 📊 Approach
 
-### Multi-Stage AI Pipeline
+### Architecture Overview
 
-1. **Audio Input** → Base64 decode MP3
-2. **Transcription** → OpenAI Whisper API (multilingual)
-3. **NLP Analysis** → GPT-4-turbo with structured output
-4. **SOP Validation** → Rule-based scoring from GPT analysis
-5. **Analytics Extraction** → Categorized business intelligence
-6. **Response** → Structured JSON output
+```
+┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
+│   Audio Input   │────▶│  Groq Whisper   │────▶│ Transcript      │
+│   (Base64 MP3)  │     │  Large v3 STT   │     │ (Cleaned)       │
+└─────────────────┘     └─────────────────┘     └────────┬────────┘
+                                                         │
+┌─────────────────┐     ┌─────────────────┐     ┌────────▼────────┐
+│   JSON Response │◀────│  Validation &   │◀────│  Groq Llama 3.3 │
+│   + DB Storage  │     │  Pattern Detect │     │  70B Analysis   │
+└─────────────────┘     └─────────────────┘     └─────────────────┘
+```
+
+### Processing Pipeline
+
+1. **Audio Ingestion** - Accept base64-encoded audio via REST API
+2. **Speech-to-Text** - Groq Whisper Large v3 transcribes Hindi/Tamil/English
+3. **Transcript Cleaning** - Remove garbled characters using Unicode filtering
+4. **LLM Analysis** - Groq Llama 3.3 70B extracts structured compliance data
+5. **Pattern Detection** - Regex patterns detect greetings, closings, solutions
+6. **Score Calculation** - 0.2 per SOP step, FOLLOWED if ≥ 0.8
+7. **Database Storage** - Supabase PostgreSQL stores all analysis results
 
 ### Why This Approach?
 
-- **Whisper API** - Best-in-class for code-mixed languages (Hinglish/Tanglish)
-- **GPT-4-turbo** - Accurate understanding of context and intent
-- **JSON Mode** - Guaranteed structured output for reliable parsing
-- **Validation Layer** - Ensures all outputs match required categories
+- **Groq Whisper** - FREE, fast, excellent multilingual (Hinglish/Tanglish)
+- **Groq Llama 3.3 70B** - FREE, high accuracy, structured JSON output
+- **Pattern Detection** - Catches cases LLM might miss (Tamil closing phrases)
+- **Validation Layer** - Ensures outputs match required categories exactly
+
+## 🤖 AI Tools Used
+
+> **Disclosure:** The following AI tools were used in development:
+
+| Tool | Purpose | Usage |
+|------|---------|-------|
+| **Groq Whisper Large v3** | Speech-to-Text | Production - transcribes audio files |
+| **Groq Llama 3.3 70B** | NLP Analysis | Production - SOP validation, summarization, analytics |
+| **GitHub Copilot** | Code Assistance | Development - code suggestions and debugging |
+| **Claude (Anthropic)** | Architecture Design | Development - API design and optimization |
+
+## ⚠️ Known Limitations
+
+1. **Mixed-Language Transcription** - Tamil/Hindi with heavy English mixing may produce some garbled characters
+2. **Cold Start** - Render free tier sleeps after 15 min inactivity (30-60s wake time)
+3. **Audio Quality** - Best results with clear audio, minimal background noise
+4. **Rate Limits** - Groq free tier: ~30 requests/minute
 
 ## 📄 License
 
 MIT License
+
+---
+
+**Built for GUVI AI Challenge - Track 3: Call Center Compliance**

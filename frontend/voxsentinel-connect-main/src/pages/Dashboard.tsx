@@ -75,14 +75,14 @@ const Dashboard = () => {
     },
     { 
       label: "Compliance Rate", 
-      value: displayStats.avg_compliance * 100, 
+      value: displayStats.avg_compliance,  // Backend already returns as percentage
       prefix: "", 
       suffix: "%", 
       decimals: 1, 
       icon: ShieldCheck, 
-      trend: displayStats.avg_compliance >= 0.90 ? "On target" : "Below target", 
-      up: displayStats.avg_compliance >= 0.90, 
-      spark: [91, 93, 89, 95, 94, 97, displayStats.avg_compliance * 100] 
+      trend: displayStats.avg_compliance >= 90 ? "On target" : "Below target",  // Compare to 90% not 0.90
+      up: displayStats.avg_compliance >= 90, 
+      spark: [91, 93, 89, 95, 94, 97, displayStats.avg_compliance] 
     },
     { 
       label: "Flagged Calls", 
@@ -121,7 +121,7 @@ const Dashboard = () => {
     { name: "Thu", compliance: 95, calls: 440 },
     { name: "Fri", compliance: 94, calls: 390 },
     { name: "Sat", compliance: 97, calls: 210 },
-    { name: "Sun", compliance: Math.round(displayStats.avg_compliance * 100), calls: displayStats.calls_today },
+    { name: "Sun", compliance: Math.round(displayStats.avg_compliance), calls: displayStats.calls_today },  // Already a percentage
   ];
 
   return (

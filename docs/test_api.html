@@ -237,7 +237,7 @@
     </div>
     
     <script>
-        const API_URL = 'http://localhost:8000';
+        const API_URL = 'https://voxsentinel.onrender.com';
         const API_KEY = 'sk_track3_987654321';
         
         document.getElementById('audioFile').addEventListener('change', function(e) {
@@ -275,7 +275,9 @@
         async function testStats() {
             showStatus('Fetching statistics...', 'loading');
             try {
-                const response = await fetch(`${API_URL}/api/stats`);
+                const response = await fetch(`${API_URL}/api/stats`, {
+                    headers: { 'X-API-Key': API_KEY }
+                });
                 const data = await response.json();
                 showStatus(`✅ Stats Retrieved (${response.status})`, 'success');
                 showResult(data);
@@ -287,7 +289,9 @@
         async function testHistory() {
             showStatus('Fetching call history...', 'loading');
             try {
-                const response = await fetch(`${API_URL}/api/history?limit=5`);
+                const response = await fetch(`${API_URL}/api/history?limit=5`, {
+                    headers: { 'X-API-Key': API_KEY }
+                });
                 const data = await response.json();
                 showStatus(`✅ History Retrieved (${data.total} total calls)`, 'success');
                 showResult(data);

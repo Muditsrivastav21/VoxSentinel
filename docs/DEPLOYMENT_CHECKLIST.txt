@@ -1,0 +1,115 @@
+┌─────────────────────────────────────────────────────┐
+│  🚀 RENDER DEPLOYMENT - QUICK CHECKLIST              │
+└─────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════
+BEFORE YOU START
+═══════════════════════════════════════════════════════
+
+□ GitHub account created
+□ Render account created (render.com)
+□ Code pushed to GitHub repository
+□ Have these API keys ready:
+  □ GROQ_API_KEY
+  □ SUPABASE_URL
+  □ SUPABASE_KEY
+  □ API_KEY (create a secure random string)
+
+═══════════════════════════════════════════════════════
+DEPLOYMENT STEPS
+═══════════════════════════════════════════════════════
+
+STEP 1: PUSH TO GITHUB
+□ git add .
+□ git commit -m "Ready for deployment"
+□ git push origin main
+
+STEP 2: DEPLOY BACKEND (5 minutes)
+□ Go to dashboard.render.com
+□ Click "New +" → "Web Service"
+□ Select your GitHub repo
+□ Settings:
+  □ Name: voxsentinel-api
+  □ Root Directory: AI-Voice-Detection-main
+  □ Build Command: pip install -r requirements.txt
+  □ Start Command: uvicorn app:app --host 0.0.0.0 --port $PORT
+  □ Instance Type: Free
+□ Add Environment Variables (click "Add Environment Variable" 8 times):
+  □ GROQ_API_KEY = (your key)
+  □ API_KEY = (your key)
+  □ SUPABASE_URL = (your URL)
+  □ SUPABASE_KEY = (your key)
+  □ STT_PROVIDER = groq
+  □ AI_PROVIDER = groq
+  □ ENVIRONMENT = production
+  □ DEMO_MODE = false
+□ Click "Create Web Service"
+□ Wait for deployment (check logs)
+□ COPY BACKEND URL: https://voxsentinel-api-XXXX.onrender.com
+
+STEP 3: DEPLOY FRONTEND (5 minutes)
+□ Click "New +" → "Static Site"
+□ Select SAME GitHub repo
+□ Settings:
+  □ Name: voxsentinel-frontend
+  □ Root Directory: frontend/voxsentinel-connect-main
+  □ Build Command: npm install && npm run build
+  □ Publish Directory: dist
+□ Add Environment Variables:
+  □ VITE_API_URL = (paste backend URL from Step 2)
+  □ NODE_ENV = production
+□ Click "Create Static Site"
+□ Wait for deployment
+
+STEP 4: UPDATE BACKEND CORS
+□ Open AI-Voice-Detection-main/app.py
+□ Add frontend URL to CORS origins
+□ git commit & git push
+
+STEP 5: TEST
+□ Open backend URL → Should see {"status":"healthy"}
+□ Open frontend URL → Should load your React app
+□ Try uploading audio file
+
+═══════════════════════════════════════════════════════
+YOUR LIVE URLS
+═══════════════════════════════════════════════════════
+
+Frontend: https://voxsentinel-frontend.onrender.com
+Backend:  https://voxsentinel-api.onrender.com
+API Docs: https://voxsentinel-api.onrender.com/docs
+
+═══════════════════════════════════════════════════════
+MAKING CHANGES AFTER DEPLOYMENT
+═══════════════════════════════════════════════════════
+
+1. Edit code locally
+2. git add .
+3. git commit -m "Your changes"
+4. git push
+5. Wait 2-5 minutes → Changes auto-deploy! ✅
+
+═══════════════════════════════════════════════════════
+TROUBLESHOOTING
+═══════════════════════════════════════════════════════
+
+❌ Build failed?
+   → Check logs in Render dashboard
+   → Verify requirements.txt/package.json
+
+❌ Frontend can't connect to backend?
+   → Check CORS settings
+   → Verify VITE_API_URL is correct
+
+❌ Environment variables not working?
+   → Check spelling (case-sensitive!)
+   → Manual redeploy: Dashboard → "Manual Deploy"
+
+❌ App sleeping?
+   → Free tier sleeps after 15 min
+   → First request takes 30s
+   → Use keep-alive script (included)
+
+═══════════════════════════════════════════════════════
+
+✅ Read full guide: RENDER_DEPLOYMENT_GUIDE.md
