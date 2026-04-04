@@ -638,6 +638,11 @@ def transcribe_audio(audio_path: str, language: str) -> str:
     logger.info(f"Transcribing audio with {STT_PROVIDER}: {language}")
     start_time = time.time()
     
+    # ✅ VALIDATE FILE EXISTS
+    if not os.path.exists(audio_path):
+        logger.error(f"Audio file not found: {audio_path}")
+        raise HTTPException(status_code=500, detail="Audio file not found during transcription")
+    
     # Try Groq first (FREE Whisper Large v3)
     if STT_PROVIDER == "groq" and groq_client:
         try:
@@ -1236,6 +1241,18 @@ def analyze_call(
         with tempfile.NamedTemporaryFile(delete=False, suffix=".mp3") as tmp:
             tmp.write(audio_bytes)
             temp_path = tmp.name
+        
+        # ✅ VERIFY FILE EXISTS BEFORE TRANSCRIPTION
+        if not temp_path or not os.path.exists(temp_path):
+            logger.error(f"Failed to create temporary audio file: {temp_path}")
+            raise HTTPException(status_code=500, detail="Failed to process audio file. Please try again.")
+        
+        file_size = os.path.getsize(temp_path)
+        if file_size == 0:
+            logger.error(f"Temporary audio file is empty: {temp_path}")
+            raise HTTPException(status_code=400, detail="Audio file is empty. Please upload a valid audio file.")
+        
+        logger.info(f"Temporary audio file created: {temp_path} ({file_size} bytes)")
         
         # 🎤 STEP 1: TRANSCRIPTION
         raw_transcript = transcribe_audio(temp_path, request.language)
