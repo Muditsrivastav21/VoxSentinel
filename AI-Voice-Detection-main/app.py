@@ -646,6 +646,7 @@ def transcribe_audio(audio_path: str, language: str) -> str:
     # Try Groq first (FREE Whisper Large v3)
     if STT_PROVIDER == "groq" and groq_client:
         try:
+            logger.info(f"Opening audio file for Groq transcription: {audio_path}")
             with open(audio_path, "rb") as audio_file:
                 transcript = groq_client.audio.transcriptions.create(
                     model="whisper-large-v3",
@@ -659,7 +660,9 @@ def transcribe_audio(audio_path: str, language: str) -> str:
             return transcript.strip()
         except Exception as e:
             logger.error(f"Groq transcription error: {str(e)}")
-            # Fall through to next provider
+            # If this is the only provider configured, raise the actual error
+            if STT_PROVIDER == "groq":
+                raise HTTPException(status_code=503, detail=f"Transcription failed: {str(e)}")
     
     # Try AssemblyAI
     if STT_PROVIDER == "assemblyai" and ASSEMBLYAI_API_KEY:
@@ -811,7 +814,9 @@ Return ONLY the JSON object, no additional text."""
             return analysis
         except Exception as e:
             logger.error(f"Groq analysis error: {str(e)}")
-            # Fall through to OpenAI
+            # If only Groq is configured and it fails, raise the actual error
+            if not openai_client:
+                raise HTTPException(status_code=503, detail=f"AI analysis failed: {str(e)}")
     
     # Fallback to OpenAI
     if openai_client:
