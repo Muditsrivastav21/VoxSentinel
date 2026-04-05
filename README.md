@@ -1,4 +1,4 @@
-# VoxSentinel - AI-Powered Call Center Compliance API
+# VoxSentinel - AI-Powered Call Center Compliance
 
 > **🚀 Live URL:** https://voxsentinel.onrender.com  
 > **🔑 API Key:** `sk_track3_987654321`  
