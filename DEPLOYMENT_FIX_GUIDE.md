@@ -9,7 +9,7 @@
 - **Changes**: Added file existence and size validation before transcription (lines 1239-1247)
 - **What it fixes**: Prevents "file not found" errors when processing audio uploads
 
-### 2. **Enhanced Error Logging - FIXED** ✅
+### 2. **Enhanced Error Logging - FIXED** 
 - **File**: `AI-Voice-Detection-main/app.py`
 - **Changes**: Added file path validation in `transcribe_audio()` function (line 642)
 - **What it fixes**: Better error messages when audio processing fails
