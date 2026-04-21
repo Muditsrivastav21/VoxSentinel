@@ -68,7 +68,7 @@ VoxSentinel/
 │       ├── package.json        # Node dependencies
 │       └── vite.config.ts      # Vite configuration
 │
-└── README.md                   # This file
+└── README.md                   # This filE
 ```
 
 ---
